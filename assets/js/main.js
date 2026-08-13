@@ -1,32 +1,49 @@
-/*
-	DataDecision
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
+// Mobile nav toggle
+(function () {
+  var menuToggle = document.getElementById('menu-toggle');
+  var navLinks = document.getElementById('nav-links');
 
-(function($) {
+  if (menuToggle && navLinks) {
+    menuToggle.addEventListener('click', function () {
+      var isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+      menuToggle.setAttribute('aria-expanded', String(!isExpanded));
+      navLinks.classList.toggle('is-open');
+      menuToggle.classList.toggle('is-active');
+      document.body.style.overflow = !isExpanded ? 'hidden' : '';
+    });
 
-	var	$window = $(window),
-		$body = $('body');
+    navLinks.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        navLinks.classList.remove('is-open');
+        menuToggle.classList.remove('is-active');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    });
+  }
 
-	// Breakpoints.
-		breakpoints({
-			xlarge:   [ '1141px',  '1680px' ],
-			large:    [ '981px',   '1140px' ],
-			medium:   [ '737px',   '980px'  ],
-			small:    [ '481px',   '736px'  ],
-			xsmall:   [ '321px',   '480px'  ],
-			xxsmall:  [ null,      '320px'  ]
-		});
+  // Copy-to-clipboard on contact page
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
 
-	// Play initial animations on page load.
-		$window.on('load', function() {
-			window.setTimeout(function() {
-				$body.removeClass('is-preload');
-			}, 100);
-		});
+      var card = btn.closest('.contact-method');
+      var valueEl = card ? card.querySelector('.value') : null;
+      var textToCopy = valueEl ? valueEl.getAttribute('data-value') : null;
 
-	// Scrolly.
-		$('.scrolly').scrolly();
-
-})(jQuery);
+      if (textToCopy && navigator.clipboard) {
+        navigator.clipboard.writeText(textToCopy).then(function () {
+          var copyIcon = btn.querySelector('.copy-icon');
+          var checkIcon = btn.querySelector('.check-icon');
+          if (copyIcon) copyIcon.classList.add('hidden');
+          if (checkIcon) checkIcon.classList.remove('hidden');
+          setTimeout(function () {
+            if (copyIcon) copyIcon.classList.remove('hidden');
+            if (checkIcon) checkIcon.classList.add('hidden');
+          }, 2000);
+        });
+      }
+    });
+  });
+})();
